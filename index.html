@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ricevute">
+<meta name="theme-color" content="#0d3b26">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Ricevute Condominiali Telematiche</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g1:#0d3b26;--g2:#1E8449;--g3:#27ae60;--gc:#e8f5e9;
+  --b1:#0a2744;--b2:#1A5276;--b3:#2471a3;
+  --gold:#f1c40f;--r:#c0392b;--v:#7d3c98;
+  --bg:#f0f4f0;--card:#ffffff;
+  --shadow:0 4px 24px rgba(0,0,0,0.08);
+  --shadow2:0 8px 40px rgba(0,0,0,0.14);
+  --rad:20px;--rad2:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow-x:hidden;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:#1a1a2e;min-height:100vh;}
+
+/* HEADER */
+header{
+  background:linear-gradient(135deg,var(--g1) 0%,var(--b1) 100%);
+  padding:20px 20px 16px;
+  position:sticky;top:0;z-index:200;
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+.h-top{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.h-logo{display:flex;align-items:center;gap:12px;}
+.h-icon{width:44px;height:44px;background:linear-gradient(135deg,var(--g2),var(--g3));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(39,174,96,0.4);}
+.h-text h1{font-family:'Playfair Display',serif;font-size:clamp(15px,4vw,20px);font-weight:900;color:white;letter-spacing:0.3px;}
+.h-text p{font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;}
+.h-anno{background:linear-gradient(135deg,var(--g2),var(--g3));color:white;border-radius:30px;padding:7px 16px;font-size:12px;font-weight:700;box-shadow:0 4px 12px rgba(39,174,96,0.35);}
+
+/* TABS */
+.tabs{background:linear-gradient(135deg,var(--g1),var(--b1));display:flex;overflow-x:auto;scrollbar-width:none;padding:0 8px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:12px 16px;border:none;background:none;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);border-bottom:3px solid transparent;white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all 0.2s;touch-action:manipulation;}
+.tab.on{color:var(--gold);border-bottom-color:var(--gold);font-weight:800;}
+.tab:active{opacity:0.7;}
+
+/* MAIN */
+main{max-width:860px;margin:0 auto;padding:18px 14px 32px;}
+
+/* SEZIONI */
+.sec{display:none;animation:fadeIn 0.2s ease;}
+.sec.on{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--rad);box-shadow:var(--shadow);padding:22px;margin-bottom:16px;border:1px solid rgba(0,0,0,0.04);}
+.ctitle{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--b2);margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid #f5f5f5;display:flex;align-items:center;gap:8px;}
+
+/* LEGGENDA */
+.leg{background:linear-gradient(135deg,var(--g1),var(--b1));color:white;border-radius:var(--rad2);padding:16px 18px;margin-bottom:18px;}
+.leg strong{font-size:14px;}
+.litems{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;}
+.badge{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:3px 12px;font-weight:800;font-size:13px;}
+
+/* BARRA AZIONI */
+.azioni{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;}
+@media(max-width:440px){.azioni{grid-template-columns:1fr;}}
+.abtn{padding:16px 12px;border:none;border-radius:var(--rad2);font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;transition:transform 0.12s,box-shadow 0.12s;}
+.abtn:active{transform:scale(0.95);}
+.abtn.ag{background:linear-gradient(135deg,var(--g2),var(--g1));color:white;box-shadow:0 4px 16px rgba(30,132,73,0.4);}
+.abtn.ab{background:linear-gradient(135deg,var(--b2),var(--b1));color:white;box-shadow:0 4px 16px rgba(26,82,118,0.35);}
+.abtn.aw{background:linear-gradient(135deg,#25D366,#128C7E);color:white;box-shadow:0 4px 16px rgba(37,211,102,0.35);}
+.abtn.ar{background:white;color:#666;border:2px solid #e8e8e8;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+
+/* FORM */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:540px){.grid{grid-template-columns:1fr;}}
+.fg{display:flex;flex-direction:column;gap:6px;}
+.fg.full{grid-column:1/-1;}
+label{font-size:11px;font-weight:700;color:var(--b2);text-transform:uppercase;letter-spacing:0.7px;}
+select,input[type=text],input[type=number]{
+  padding:13px 16px;border:2px solid #ebebeb;border-radius:12px;
+  font-family:'Inter',sans-serif;font-size:14px;font-weight:500;
+  background:#fafffe;color:#1a1a2e;width:100%;
+  -webkit-appearance:none;appearance:none;cursor:pointer;
+  transition:border-color 0.2s,background 0.2s;
+}
+select:focus,input:focus{outline:none;border-color:var(--g2);background:white;box-shadow:0 0 0 4px rgba(30,132,73,0.08);}
+
+/* TOTALE */
+.totbox{margin-top:18px;background:linear-gradient(135deg,#e8f5e9,#e3f2fd);border-radius:var(--rad2);padding:18px 22px;display:flex;justify-content:space-between;align-items:center;border:2px solid #c8e6c9;}
+.totbox .tl{font-weight:700;font-size:15px;}
+.totbox .tv{font-size:32px;font-weight:800;color:var(--g2);font-family:'Playfair Display',serif;}
+
+/* PIN RICEVUTA */
+.pin{margin-top:20px;border:2px dashed #c8e6c9;border-radius:var(--rad);padding:20px;background:linear-gradient(135deg,#f8fffa,#f0f8ff);position:relative;}
+.pin::before{content:'📌';position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:22px;background:var(--bg);padding:0 10px;}
+.pin-title{text-align:center;font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;}
+.pbtn{width:100%;padding:14px;border-radius:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;touch-action:manipulation;border:none;transition:transform 0.12s;}
+.pbtn:active{transform:scale(0.97);}
+.pbtn.pb{background:linear-gradient(135deg,var(--b2),var(--b1));color:white;}
+.pbtn.pw{background:linear-gradient(135deg,#25D366,#128C7E);color:white;}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:18px;}
+@media(min-width:560px){.sgrid{grid-template-columns:repeat(4,1fr);}}
+.scard{background:white;border-radius:var(--rad2);padding:18px 14px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.scard::after{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:4px 4px 0 0;}
+.scard.g::after{background:linear-gradient(90deg,var(--g2),var(--g3));}
+.scard.r::after{background:linear-gradient(90deg,var(--r),#e74c3c);}
+.scard.b::after{background:linear-gradient(90deg,var(--b2),var(--b3));}
+.scard.v::after{background:linear-gradient(90deg,var(--v),#9b59b6);}
+.snum{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-top:6px;}
+.scard.g .snum{color:var(--g2);}.scard.r .snum{color:var(--r);}
+.scard.b .snum{color:var(--b2);}.scard.v .snum{color:var(--v);}
+.slbl{font-size:10px;color:#bbb;margin-top:4px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600;}
+
+/* TABLE */
+.twrap{overflow-x:auto;border-radius:14px;border:1px solid #f0f0f0;}
+.rt{width:100%;border-collapse:collapse;font-size:11px;}
+.rt th{background:linear-gradient(135deg,var(--b2),var(--b3));color:white;padding:11px 7px;text-align:center;font-weight:700;white-space:nowrap;}
+.rt td{padding:10px 7px;border-bottom:1px solid #f8f8f8;text-align:center;}
+.rt tr:nth-child(even) td{background:#fafffe;}
+.rt tr:hover td{background:#f0fff4;}
+.pv{background:linear-gradient(135deg,var(--g2),var(--g3));color:white;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 6px rgba(30,132,73,0.3);}
+.pr{background:#eee;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;color:#ccc;}
+
+/* RICEVUTA */
+.ric{max-width:520px;margin:0 auto;border-radius:var(--rad);overflow:hidden;box-shadow:var(--shadow2);}
+.rh{background:linear-gradient(135deg,var(--g1),var(--b1));color:white;padding:26px 22px;text-align:center;}
+.rh h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;letter-spacing:0.5px;}
+.rh p{font-size:11px;color:rgba(255,255,255,0.7);margin-top:5px;text-transform:uppercase;letter-spacing:1.5px;}
+.rb{padding:22px;background:white;}
+.rs{margin-bottom:12px;border-radius:12px;overflow:hidden;border:1px solid #f0f0f0;}
+.rr{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid #fafafa;}
+.rr:last-child{border-bottom:none;}
+.rl{font-size:12px;color:#aaa;font-weight:500;}
+.rv{font-size:13px;font-weight:700;color:#1a1a2e;}
+.rtot{background:linear-gradient(135deg,#e8f5e9,#e3f2fd);border-radius:12px;padding:16px 20px;margin:14px 0;display:flex;justify-content:space-between;align-items:center;border:2px solid #c8e6c9;}
+.rtot .l{font-size:15px;font-weight:800;}
+.rtot .v{font-size:28px;font-weight:900;color:var(--g2);font-family:'Playfair Display',serif;}
+.spag{background:linear-gradient(135deg,var(--g2),var(--g3));color:white;text-align:center;padding:13px;font-weight:800;font-size:14px;border-radius:12px;margin-top:10px;letter-spacing:0.5px;}
+.snop{background:linear-gradient(135deg,var(--r),#e74c3c);color:white;text-align:center;padding:13px;font-weight:800;font-size:14px;border-radius:12px;margin-top:10px;}
+.rfirma{text-align:center;margin-top:16px;padding:14px;background:#f9f9f9;border-radius:12px;color:#aaa;font-size:12px;border:2px dashed #e8e8e8;}
+
+/* MESI CHECK */
+.mc{display:flex;align-items:center;gap:8px;padding:12px 10px;border-radius:12px;border:2px solid #e8e8e8;background:white;cursor:pointer;font-size:13px;font-weight:700;touch-action:manipulation;transition:all 0.15s;}
+.mc.pagato{border-color:var(--g2);background:#e8f5e9;color:var(--g1);}
+
+/* INQUILINI */
+.ic{background:linear-gradient(135deg,#f8fbff,#f0fff4);border-radius:var(--rad2);padding:18px;margin-bottom:12px;border:1px solid #e8f0e8;}
+.inum{background:linear-gradient(135deg,var(--b2),var(--b3));color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;}
+
+/* PULSANTI */
+.btn{padding:13px 20px;border:none;border-radius:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;touch-action:manipulation;transition:transform 0.12s;}
+.btn:active{transform:scale(0.96);}
+.btn.g{background:linear-gradient(135deg,var(--g2),var(--g1));color:white;box-shadow:0 4px 14px rgba(30,132,73,0.35);}
+.btn.b{background:linear-gradient(135deg,var(--b2),var(--b1));color:white;box-shadow:0 4px 14px rgba(26,82,118,0.3);}
+.btn.r{background:linear-gradient(135deg,var(--r),#922b21);color:white;}
+.btn.w{background:linear-gradient(135deg,#25D366,#128C7E);color:white;}
+.btn.o{background:white;border:2px solid #e0e0e0;color:#555;}
+.bgrp{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+.btn-lg{width:100%;justify-content:center;padding:17px;font-size:15px;border-radius:var(--rad2);}
+
+/* DANGER */
+.dz{background:linear-gradient(135deg,#fff5f5,#ffeaea);border:2px solid #ffcdd2;border-radius:var(--rad);padding:20px;margin-top:16px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:14px;right:14px;color:white;padding:15px 20px;border-radius:var(--rad2);font-weight:700;font-size:14px;z-index:9999;transform:translateY(120px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.2);}
+.toast.on{transform:translateY(0);opacity:1;}
+
+@media print{
+  header,.tabs,.azioni,.pin,.sgrid,.fg,.ctitle,#ric-actions,.no-print{display:none !important;}
+  .ric{box-shadow:none;max-width:100%;}
+  main{padding:0;max-width:100%;}
+  body{background:white;}
+  .sec{display:block !important;}
+  #sec-ins,#sec-riep,#sec-imp,#sec-inq,#sec-mul{display:none !important;}
+  #sec-ric{display:block !important;}
+  .card{box-shadow:none;padding:0;margin:0;border:none;}
+  @page{margin:10mm;size:A4;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-top">
+    <div class="h-logo">
+      <div class="h-icon">🏢</div>
+      <div class="h-text">
+        <h1>Ricevute Condominiali Telematiche</h1>
+        <p>VIA CORTE ORAZIO FLACCO,3</p>
+      </div>
+    </div>
+    <div class="h-anno">Anno <span id="annoH">2026</span></div>
+  </div>
+</header>
+
+<div class="tabs" id="tabs">
+  <button class="tab on" data-tab="ins">📝 Inserimento</button>
+  <button class="tab" data-tab="riep">📊 Riepilogo</button>
+  <button class="tab" data-tab="ric">🧾 Ricevuta</button>
+  <button class="tab" data-tab="mul">📅 Più Mesi</button>
+  <button class="tab" data-tab="inq">👥 Inquilini</button>
+  <button class="tab" data-tab="imp">⚙️ Impostazioni</button>
+</div>
+
+<main>
+
+<!-- INSERIMENTO -->
+<div id="sec-ins" class="sec on">
+  <div class="leg">
+    <strong>📌 Ricevuta A / B / C</strong> — fino a 3 ricevute per mese senza sovrascrivere
+    <div class="litems">
+      <span><span class="badge">A</span> Prima ricevuta</span>
+      <span><span class="badge">B</span> Seconda ricevuta</span>
+      <span><span class="badge">C</span> Terza ricevuta</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ctitle">📝 Inserimento Pagamento</div>
+    <div class="azioni">
+      <button class="abtn ag" id="btn-salva">💾 Salva Pagamento</button>
+      <button class="abtn ab" id="btn-stampa">🖨️ Stampa / PDF</button>
+      <button class="abtn aw" id="btn-wa">📱 Invia WhatsApp</button>
+      <button class="abtn ar" id="btn-reset">🔄 Pulisci Campi</button>
+    </div>
+    <div class="grid">
+      <div class="fg"><label>Inquilino</label><select id="i-inq"></select></div>
+      <div class="fg"><label>Mese</label>
+        <select id="i-mese">
+          <option value="">-- Scegli mese --</option>
+          <option>Gennaio</option><option>Febbraio</option><option>Marzo</option><option>Aprile</option>
+          <option>Maggio</option><option>Giugno</option><option>Luglio</option><option>Agosto</option>
+          <option>Settembre</option><option>Ottobre</option><option>Novembre</option><option>Dicembre</option>
+        </select>
+      </div>
+      <div class="fg"><label>Ricevuta (A/B/C)</label>
+        <select id="i-slot"><option value="A">A — Prima</option><option value="B">B — Seconda</option><option value="C">C — Terza</option></select>
+      </div>
+      <div class="fg"><label>Includi Quota</label>
+        <select id="i-quota"><option value="SI">✅ Includi quota</option><option value="NO">❌ Solo spese</option></select>
+      </div>
+      <div class="fg"><label>Spese 1 (€)</label><input type="number" id="i-s1" value="0" min="0" step="0.01"></div>
+      <div class="fg"><label>Descrizione 1</label><input type="text" id="i-d1" placeholder="es. Pulizia scale"></div>
+      <div class="fg"><label>Spese 2 (€)</label><input type="number" id="i-s2" value="0" min="0" step="0.01"></div>
+      <div class="fg"><label>Descrizione 2</label><input type="text" id="i-d2" placeholder="es. Citofono"></div>
+      <div class="fg"><label>Spese 3 (€)</label><input type="number" id="i-s3" value="0" min="0" step="0.01"></div>
+      <div class="fg"><label>Descrizione 3</label><input type="text" id="i-d3" placeholder="es. Lavori"></div>
+      <div class="fg"><label>Modalità</label>
+        <select id="i-mod"><option>CONTANTI</option><option>BONIFICO</option><option>ASSEGNO</option></select>
+      </div>
+      <div class="fg"><label>Stato</label>
+        <select id="i-pag"><option value="SI">✅ PAGATO</option><option value="NO">❌ NON PAGATO</option></select>
+      </div>
+    </div>
+    <div class="totbox"><span class="tl">TOTALE RICEVUTA</span><span class="tv" id="tot-live">€ 10,00</span></div>
+
+    <div class="pin">
+      <div class="pin-title">Visualizza ricevuta salvata</div>
+      <div class="grid" style="margin-bottom:14px;">
+        <div class="fg"><label>Inquilino</label><select id="p-inq"></select></div>
+        <div class="fg"><label>Mese</label>
+          <select id="p-mese">
+            <option value="">-- Scegli --</option>
+            <option>Gennaio</option><option>Febbraio</option><option>Marzo</option><option>Aprile</option>
+            <option>Maggio</option><option>Giugno</option><option>Luglio</option><option>Agosto</option>
+            <option>Settembre</option><option>Ottobre</option><option>Novembre</option><option>Dicembre</option>
+          </select>
+        </div>
+        <div class="fg"><label>Ricevuta</label><select id="p-slot"><option>A</option><option>B</option><option>C</option></select></div>
+      </div>
+      <button class="pbtn pb no-print" id="btn-mostra-pin">👁️ Visualizza Ricevuta</button>
+      <div id="pin-prev"></div>
+      <div id="pin-act" style="display:none;margin-top:12px;">
+        <button class="pbtn pb" id="btn-pin-stampa">🖨️ Stampa</button>
+        <button class="pbtn pw" id="btn-pin-wa">📱 Invia WhatsApp</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RIEPILOGO -->
+<div id="sec-riep" class="sec">
+  <div class="sgrid">
+    <div class="scard g"><div class="snum" id="s1">0</div><div class="slbl">Mesi Pagati</div></div>
+    <div class="scard r"><div class="snum" id="s2">0</div><div class="slbl">Non Pagati</div></div>
+    <div class="scard b"><div class="snum" id="s3">€0</div><div class="slbl">Incassato</div></div>
+    <div class="scard v"><div class="snum" id="s4">€0</div><div class="slbl">Da Incassare</div></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">📊 Riepilogo <span id="annoR">2026</span></div>
+    <div class="twrap">
+      <table class="rt">
+        <thead><tr>
+          <th>#</th><th style="text-align:left;min-width:120px">Nome</th><th>Piano</th>
+          <th>GEN</th><th>FEB</th><th>MAR</th><th>APR</th><th>MAG</th><th>GIU</th>
+          <th>LUG</th><th>AGO</th><th>SET</th><th>OTT</th><th>NOV</th><th>DIC</th>
+          <th>Mesi</th><th>Totale</th><th>Saldo</th>
+        </tr></thead>
+        <tbody id="tb-riep"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- RICEVUTA -->
+<div id="sec-ric" class="sec">
+  <div class="card">
+    <div class="ctitle no-print">🧾 Visualizza Ricevuta</div>
+    <div class="grid no-print" style="margin-bottom:16px;">
+      <div class="fg"><label>Inquilino</label><select id="r-inq"></select></div>
+      <div class="fg"><label>Mese</label>
+        <select id="r-mese">
+          <option value="">-- Scegli --</option>
+          <option>Gennaio</option><option>Febbraio</option><option>Marzo</option><option>Aprile</option>
+          <option>Maggio</option><option>Giugno</option><option>Luglio</option><option>Agosto</option>
+          <option>Settembre</option><option>Ottobre</option><option>Novembre</option><option>Dicembre</option>
+        </select>
+      </div>
+      <div class="fg no-print"><label>Ricevuta</label><select id="r-slot"><option>A</option><option>B</option><option>C</option></select></div>
+    </div>
+    <button class="btn b btn-lg no-print" id="btn-mostra-ric" style="margin-bottom:16px;">👁️ Mostra Ricevuta</button>
+    <div id="ric-prev"></div>
+    <div class="bgrp no-print" id="ric-actions" style="display:none;">
+      <button class="btn b" id="btn-ric-stampa">🖨️ Stampa</button>
+      <button class="btn w" id="btn-ric-wa">📱 WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIU MESI -->
+<div id="sec-mul" class="sec">
+  <div class="card">
+    <div class="ctitle">📅 Pagamento Più Mesi</div>
+    <p style="color:#bbb;font-size:13px;margin-bottom:18px;">Seleziona l'inquilino e spunta i mesi da pagare insieme!</p>
+    <div class="grid" style="margin-bottom:18px;">
+      <div class="fg"><label>Inquilino</label><select id="m-inq"></select></div>
+      <div class="fg"><label>Ricevuta</label><select id="m-slot"><option>A</option><option>B</option><option>C</option></select></div>
+      <div class="fg"><label>Includi Quota</label><select id="m-quota"><option value="SI">✅ SI</option><option value="NO">❌ NO</option></select></div>
+      <div class="fg"><label>Modalità</label><select id="m-mod"><option>CONTANTI</option><option>BONIFICO</option><option>ASSEGNO</option></select></div>
+      <div class="fg"><label>Stato</label><select id="m-pag"><option value="SI">✅ PAGATO</option><option value="NO">❌ NON PAGATO</option></select></div>
+    </div>
+    <button class="btn b btn-lg" id="btn-carica-mesi" style="margin-bottom:14px;">🔄 Carica Mesi Inquilino</button>
+    <div style="font-size:11px;font-weight:700;color:var(--b2);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">Seleziona mesi:</div>
+    <div id="mesi-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;gap:8px;">
+        <button class="btn b" style="padding:9px 14px;font-size:12px;" id="btn-sel-all">☑️ Tutti</button>
+        <button class="btn o" style="padding:9px 14px;font-size:12px;" id="btn-desel">⬜ Nessuno</button>
+      </div>
+      <div style="font-size:20px;font-weight:800;color:var(--g2);">Tot: <span id="m-tot">€ 0,00</span></div>
+    </div>
+    <button class="btn g btn-lg" id="btn-salva-multi">💾 SALVA MESI SELEZIONATI</button>
+  </div>
+</div>
+
+<!-- INQUILINI -->
+<div id="sec-inq" class="sec">
+  <div class="card">
+    <div class="ctitle">👥 Modifica Inquilini</div>
+    <p style="color:#bbb;font-size:13px;margin-bottom:18px;">⚠️ Modificando il nome verrà aggiornato ovunque.</p>
+    <div id="form-inq"></div>
+    <div class="bgrp"><button class="btn g" id="btn-salva-inq">💾 Salva Modifiche</button></div>
+  </div>
+</div>
+
+<!-- IMPOSTAZIONI -->
+<div id="sec-imp" class="sec">
+  <div class="card">
+    <div class="ctitle">⚙️ Impostazioni Condominio</div>
+    <div class="grid">
+      <div class="fg"><label>Condominio</label><input type="text" id="s-cond"></div>
+      <div class="fg"><label>Indirizzo</label><input type="text" id="s-ind"></div>
+      <div class="fg"><label>Anno</label><input type="number" id="s-anno"></div>
+      <div class="fg"><label>Quota Mensile (€)</label><input type="number" id="s-quota" step="0.01"></div>
+      <div class="fg full"><label>Capo Scala</label><input type="text" id="s-capo"></div>
+    </div>
+    <div class="bgrp"><button class="btn g" id="btn-salva-conf">💾 Salva Impostazioni</button></div>
+  </div>
+  <div class="dz">
+    <div style="color:var(--r);font-weight:800;font-size:15px;margin-bottom:6px;">🔄 Nuovo Anno</div>
+    <div style="font-size:12px;color:#aaa;margin-bottom:14px;">Azzera tutti i pagamenti per il nuovo anno. Salva una copia prima!</div>
+    <button class="btn r" id="btn-nuovo-anno">🔄 Avvia Nuovo Anno</button>
+  </div>
+</div>
+
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const MESI=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+const MS=['GEN','FEB','MAR','APR','MAG','GIU','LUG','AGO','SET','OTT','NOV','DIC'];
+const INQ0=[
+  {id:1,nome:'GIGLIOLA Danilo',piano:'2 Piano',interno:'Int. 6'},
+  {id:2,nome:'MELPIGNANO Fabio',piano:'2 Piano',interno:'Int. 5'},
+  {id:3,nome:'MONACO F./ATTANASI A.',piano:'1 Piano',interno:'Int. 4'},
+  {id:4,nome:'BARIKZAI A./PLATINIA A.',piano:'1 Piano',interno:'Int. 3'},
+  {id:5,nome:'QUARTA Lorenzo',piano:'Piano Rialzato',interno:'Int. 1'},
+  {id:6,nome:'EKIZASHVIKI Maia Elza',piano:'Piano Rialzato',interno:'Int. 2'},
+];
+const CFG0={cond:'ORAZIO FLACCO,3',ind:'VIA CORTE ORAZIO FLACCO,3',anno:2026,quota:10,capo:'Gigliola Danilo'};
+
+let cfg,inq,pag;
+
+function carica(){
+  try{
+    const d=JSON.parse(localStorage.getItem('rct_v1')||'null');
+    if(d){cfg=d.cfg||{...CFG0};inq=d.inq||JSON.parse(JSON.stringify(INQ0));pag=d.pag||{};}
+    else{cfg={...CFG0};inq=JSON.parse(JSON.stringify(INQ0));pag={};}
+  }catch(e){cfg={...CFG0};inq=JSON.parse(JSON.stringify(INQ0));pag={};}
+}
+function salvaLS(){try{localStorage.setItem('rct_v1',JSON.stringify({cfg,inq,pag}));}catch(e){}}
+function gI(id){return inq.find(x=>String(x.id)===String(id));}
+function gP(id,m,s){return pag[id+'__'+m+'__'+s]||null;}
+
+function fillSel(id){
+  const el=document.getElementById(id);if(!el)return;
+  const v=el.value;
+  while(el.firstChild)el.removeChild(el.firstChild);
+  el.add(new Option('-- Scegli inquilino --',''));
+  inq.forEach(i=>el.add(new Option(i.nome+' ('+i.piano+')',i.id)));
+  if(v)el.value=v;
+}
+function popolaSel(){['i-inq','p-inq','r-inq','m-inq'].forEach(fillSel);}
+
+function aggH(){
+  document.getElementById('annoH').textContent=cfg.anno;
+  document.getElementById('annoR').textContent=cfg.anno;
+}
+
+function calcTot(){
+  const q=document.getElementById('i-quota').value==='SI'?cfg.quota:0;
+  const s1=parseFloat(document.getElementById('i-s1').value)||0;
+  const s2=parseFloat(document.getElementById('i-s2').value)||0;
+  const s3=parseFloat(document.getElementById('i-s3').value)||0;
+  const t=q+s1+s2+s3;
+  document.getElementById('tot-live').textContent='€ '+t.toFixed(2).replace('.',',');
+  return t;
+}
+
+function go(name){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
+  const sec=document.getElementById('sec-'+name);
+  if(sec)sec.classList.add('on');
+  const btn=document.querySelector('[data-tab="'+name+'"]');
+  if(btn)btn.classList.add('on');
+  if(name==='riep')aggRiep();
+  if(name==='inq')mostraFormInq();
+  if(name==='ric'){popolaSel();}
+  if(name==='mul'){popolaSel();}
+  if(name==='imp'){
+    document.getElementById('s-cond').value=cfg.cond;
+    document.getElementById('s-ind').value=cfg.ind;
+    document.getElementById('s-anno').value=cfg.anno;
+    document.getElementById('s-quota').value=cfg.quota;
+    document.getElementById('s-capo').value=cfg.capo;
+  }
+}
+
+function salva(){
+  const id=document.getElementById('i-inq').value;
+  const m=document.getElementById('i-mese').value;
+  const s=document.getElementById('i-slot').value;
+  if(!id){toast('⚠️ Scegli un inquilino!',1);return;}
+  if(!m){toast('⚠️ Scegli il mese!',1);return;}
+  const q=document.getElementById('i-quota').value==='SI'?cfg.quota:0;
+  const s1=parseFloat(document.getElementById('i-s1').value)||0;
+  const d1=document.getElementById('i-d1').value.trim();
+  const s2=parseFloat(document.getElementById('i-s2').value)||0;
+  const d2=document.getElementById('i-d2').value.trim();
+  const s3=parseFloat(document.getElementById('i-s3').value)||0;
+  const d3=document.getElementById('i-d3').value.trim();
+  const mod=document.getElementById('i-mod').value;
+  const pagato=document.getElementById('i-pag').value;
+  pag[id+'__'+m+'__'+s]={id,m,s,pagato,mod,q,s1,d1,s2,d2,s3,d3,tot:q+s1+s2+s3,data:new Date().toLocaleDateString('it-IT')};
+  salvaLS();
+  toast('✅ Salvato! '+gI(id)?.nome+' — '+m+' '+s);
+  setTimeout(resetF,600);
+}
+
+function resetF(){
+  document.getElementById('i-inq').value='';
+  document.getElementById('i-mese').value='';
+  document.getElementById('i-slot').value='A';
+  document.getElementById('i-quota').value='SI';
+  ['i-s1','i-s2','i-s3'].forEach(x=>{document.getElementById(x).value='0';});
+  ['i-d1','i-d2','i-d3'].forEach(x=>{document.getElementById(x).value='';});
+  document.getElementById('i-mod').value='CONTANTI';
+  document.getElementById('i-pag').value='SI';
+  calcTot();
+}
+
+function htmlRic(io,p,m,s){
+  const mi=MESI.indexOf(m)+1;
+  const ms=MS[MESI.indexOf(m)];
+  let sp='';
+  if(p.s1>0||p.d1)sp+=`<div class="rr"><span class="rl">SPESE: ${p.d1||'Altre spese'}</span><span class="rv">€ ${p.s1.toFixed(2)}</span></div>`;
+  if(p.s2>0||p.d2)sp+=`<div class="rr"><span class="rl">SPESE: ${p.d2||'Altre spese 2'}</span><span class="rv">€ ${p.s2.toFixed(2)}</span></div>`;
+  if(p.s3>0||p.d3)sp+=`<div class="rr"><span class="rl">SPESE: ${p.d3||'Altre spese 3'}</span><span class="rv">€ ${p.s3.toFixed(2)}</span></div>`;
+  return `<div class="ric">
+    <div class="rh"><h2>RICEVUTA ${m.toUpperCase()} ${cfg.anno}</h2><p>Ricevuta Condominiale Telematica</p></div>
+    <div class="rb">
+      <div class="rs">
+        <div class="rr"><span class="rl">Condominio</span><span class="rv">${cfg.cond}</span></div>
+        <div class="rr"><span class="rl">Indirizzo</span><span class="rv">${cfg.ind}</span></div>
+        <div class="rr"><span class="rl">Ricevuta n.</span><span class="rv">${String(mi).padStart(2,'0')}${s}</span></div>
+        <div class="rr"><span class="rl">Data</span><span class="rv" style="color:var(--r);font-weight:800">${p.data}</span></div>
+        <div class="rr"><span class="rl">Mese</span><span class="rv">${ms}-${String(cfg.anno).slice(-2)}</span></div>
+      </div>
+      <div class="rs">
+        <div class="rr"><span class="rl">Ricevuto da</span><span class="rv">SIG</span></div>
+        <div class="rr"><span class="rl">Nome e Cognome</span><span class="rv">${io.nome}</span></div>
+        <div class="rr"><span class="rl">Piano</span><span class="rv">${io.piano} — ${io.interno}</span></div>
+      </div>
+      <div class="rs">
+        <div class="rr"><span class="rl" style="font-weight:700">Descrizione</span><span class="rv" style="font-weight:700">Importo</span></div>
+        <div class="rr"><span class="rl">QUOTA CONDOMIMIALE</span><span class="rv">€ ${(p.q||0).toFixed(2)}</span></div>
+        ${sp}
+      </div>
+      <div class="rtot"><span class="l">TOTALE</span><span class="v">€ ${(p.tot||0).toFixed(2)}</span></div>
+      <div class="rr"><span class="rl">Modalità Pagamento</span><span class="rv">${p.mod}</span></div>
+      <div class="${p.pagato==='SI'?'spag':'snop'}">${p.pagato==='SI'?'✅ PAGATO':'❌ NON PAGATO'}</div>
+      <div class="rfirma">Firma Capo Scala: <strong>${cfg.capo}</strong></div>
+    </div>
+  </div>`;
+}
+
+function testoWA(id,m,s){
+  const io=gI(id);const p=gP(id,m,s);if(!io||!p)return null;
+  return `🏢 *CONDOMINIO ${cfg.cond}*\n\n📋 *RICEVUTA ${m.toUpperCase()} ${cfg.anno}*\n\n👤 ${io.nome}\n🏠 ${io.piano} — ${io.interno}\n\n💰 Quota: € ${(p.q||0).toFixed(2)}`+(p.s1>0?`\n➕ ${p.d1||'Spese'}: € ${p.s1.toFixed(2)}`:'')+`\n\n💵 *TOTALE: € ${(p.tot||0).toFixed(2)}*\n💳 ${p.mod}\n${p.pagato==='SI'?'✅ PAGATO':'❌ NON PAGATO'}\n\n🖊️ ${cfg.capo}`;
+}
+
+function aggRiep(){
+  const tb=document.getElementById('tb-riep');tb.innerHTML='';
+  let tp=0,tn=0,ti=0;
+  inq.forEach((x,idx)=>{
+    let mp=0,tot=0,cells='';
+    MESI.forEach(m=>{
+      const p=gP(x.id,m,'A');
+      if(p&&p.pagato==='SI'){mp++;tot+=p.tot;tp++;ti+=p.tot;cells+=`<td><div class="pv">●</div><div style="font-size:9px;color:var(--g2);font-weight:700">€${p.tot.toFixed(0)}</div></td>`;}
+      else{tn++;cells+=`<td><div class="pr">○</div></td>`;}
+    });
+    const saldo=tot-(cfg.quota*12);
+    tb.innerHTML+=`<tr><td><b>${idx+1}</b></td><td style="text-align:left;font-size:12px"><b>${x.nome}</b></td><td style="font-size:11px">${x.piano}</td>${cells}<td><b>${mp}</b></td><td style="color:var(--g2);font-weight:700">€${tot.toFixed(2)}</td><td style="color:${saldo<0?'var(--r)':'var(--g2)'};font-weight:700">${saldo.toFixed(2)}</td></tr>`;
+  });
+  document.getElementById('s1').textContent=tp;
+  document.getElementById('s2').textContent=tn;
+  document.getElementById('s3').textContent='€'+ti.toFixed(0);
+  document.getElementById('s4').textContent='€'+Math.max(0,inq.length*12*cfg.quota-ti).toFixed(0);
+}
+
+function caricaMesi(){
+  const id=document.getElementById('m-inq').value;
+  const slot=document.getElementById('m-slot').value;
+  const grid=document.getElementById('mesi-grid');
+  grid.innerHTML='';
+  MESI.forEach((m,i)=>{
+    const p=id?gP(id,m,slot):null;
+    const ok=p&&p.pagato==='SI';
+    const lbl=document.createElement('label');
+    lbl.className='mc'+(ok?' pagato':'');
+    lbl.id='ml'+i;
+    const cb=document.createElement('input');
+    cb.type='checkbox';cb.id='mc'+i;cb.value=m;
+    if(ok)cb.checked=true;
+    cb.style.cssText='width:18px;height:18px;accent-color:var(--g2);flex-shrink:0;';
+    cb.addEventListener('change',function(){calcMTot();aggLbl(i);});
+    const sp=document.createElement('span');
+    sp.textContent=' '+MS[i]+(ok?' ✅':'');
+    lbl.appendChild(cb);lbl.appendChild(sp);
+    grid.appendChild(lbl);
+  });
+  calcMTot();
+}
+
+function aggLbl(i){
+  const cb=document.getElementById('mc'+i);
+  const l=document.getElementById('ml'+i);
+  if(cb&&l){l.style.borderColor=cb.checked?'var(--g2)':'#e8e8e8';l.style.background=cb.checked?'#e8f5e9':'white';}
+}
+function calcMTot(){
+  let c=0;MESI.forEach((_,i)=>{if(document.getElementById('mc'+i)?.checked)c++;});
+  const q=document.getElementById('m-quota')?.value==='SI'?cfg.quota:0;
+  document.getElementById('m-tot').textContent='€ '+(c*q).toFixed(2).replace('.',',');
+}
+
+function mostraFormInq(){
+  const div=document.getElementById('form-inq');div.innerHTML='';
+  inq.forEach(x=>{
+    const d=document.createElement('div');d.className='ic';
+    d.innerHTML=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <div class="inum">${x.id}</div>
+      <div style="font-weight:700;color:var(--b2);font-size:14px;">${x.nome}</div>
+    </div>
+    <div class="grid">
+      <div class="fg"><label>Nome</label><input type="text" id="in${x.id}" value="${x.nome}"></div>
+      <div class="fg"><label>Piano</label><input type="text" id="ip${x.id}" value="${x.piano}"></div>
+      <div class="fg"><label>Interno</label><input type="text" id="ii${x.id}" value="${x.interno}"></div>
+    </div>`;
+    div.appendChild(d);
+  });
+}
+
+function toast(msg,err=0){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=err?'linear-gradient(135deg,#c0392b,#e74c3c)':'linear-gradient(135deg,#1E8449,#27ae60)';
+  t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),3000);
+}
+
+// INIT — tutto con addEventListener, niente onclick inline
+function initAll(){
+  carica();popolaSel();aggH();calcTot();
+
+  // TABS
+  document.querySelectorAll('.tab[data-tab]').forEach(btn=>{
+    btn.addEventListener('click',function(){go(this.dataset.tab);});
+  });
+
+  // FORM CALCOLO
+  ['i-quota','i-s1','i-s2','i-s3'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.addEventListener('input',calcTot);el.addEventListener('change',calcTot);}
+  });
+
+  // INSERIMENTO PULSANTI
+  document.getElementById('btn-salva').addEventListener('click',salva);
+  document.getElementById('btn-reset').addEventListener('click',resetF);
+  document.getElementById('btn-stampa').addEventListener('click',function(){
+    const id=document.getElementById('i-inq').value;
+    const m=document.getElementById('i-mese').value;
+    const s=document.getElementById('i-slot').value;
+    if(!id||!m){toast('⚠️ Scegli inquilino e mese!',1);return;}
+    const p=gP(id,m,s);if(!p){toast('⚠️ Salva prima!',1);return;}
+    document.getElementById('r-inq').value=id;
+    document.getElementById('r-mese').value=m;
+    document.getElementById('r-slot').value=s;
+    const prev=document.getElementById('ric-prev');
+    prev.innerHTML=htmlRic(gI(id),p,m,s);
+    document.getElementById('ric-actions').style.display='flex';
+    go('ric');setTimeout(()=>window.print(),600);
+  });
+  document.getElementById('btn-wa').addEventListener('click',function(){
+    const t=testoWA(document.getElementById('i-inq').value,document.getElementById('i-mese').value,document.getElementById('i-slot').value);
+    if(!t){toast('⚠️ Salva prima la ricevuta!',1);return;}
+    window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');toast('📱 WhatsApp aperto!');
+  });
+
+  // PIN
+  document.getElementById('btn-mostra-pin').addEventListener('click',function(){
+    const id=document.getElementById('p-inq').value;
+    const m=document.getElementById('p-mese').value;
+    const s=document.getElementById('p-slot').value;
+    const prev=document.getElementById('pin-prev');
+    const act=document.getElementById('pin-act');
+    if(!id||!m){prev.innerHTML='';act.style.display='none';toast('⚠️ Scegli inquilino e mese!',1);return;}
+    const p=gP(id,m,s);
+    if(!p){prev.innerHTML='<p style="text-align:center;padding:20px;color:#bbb;font-size:13px;">Nessuna ricevuta trovata</p>';act.style.display='none';return;}
+    prev.innerHTML=htmlRic(gI(id),p,m,s);act.style.display='block';
+  });
+  document.getElementById('btn-pin-stampa').addEventListener('click',()=>window.print());
+  document.getElementById('btn-pin-wa').addEventListener('click',function(){
+    const t=testoWA(document.getElementById('p-inq').value,document.getElementById('p-mese').value,document.getElementById('p-slot').value);
+    if(t)window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
+  });
+
+  // RICEVUTA TAB
+  document.getElementById('btn-mostra-ric').addEventListener('click',function(){
+    const id=document.getElementById('r-inq').value;
+    const m=document.getElementById('r-mese').value;
+    const s=document.getElementById('r-slot').value;
+    const prev=document.getElementById('ric-prev');
+    const act=document.getElementById('ric-actions');
+    if(!id||!m){prev.innerHTML='';act.style.display='none';toast('⚠️ Scegli inquilino e mese!',1);return;}
+    const p=gP(id,m,s);
+    if(!p){prev.innerHTML='<p style="text-align:center;padding:40px;color:#bbb;">Nessuna ricevuta trovata</p>';act.style.display='none';return;}
+    prev.innerHTML=htmlRic(gI(id),p,m,s);act.style.display='flex';
+  });
+  document.getElementById('btn-ric-stampa').addEventListener('click',()=>window.print());
+  document.getElementById('btn-ric-wa').addEventListener('click',function(){
+    const t=testoWA(document.getElementById('r-inq').value,document.getElementById('r-mese').value,document.getElementById('r-slot').value);
+    if(t)window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
+  });
+
+  // PIU MESI
+  document.getElementById('btn-carica-mesi').addEventListener('click',caricaMesi);
+  document.getElementById('btn-sel-all').addEventListener('click',function(){MESI.forEach((_,i)=>{const c=document.getElementById('mc'+i);if(c){c.checked=true;aggLbl(i);}});calcMTot();});
+  document.getElementById('btn-desel').addEventListener('click',function(){MESI.forEach((_,i)=>{const c=document.getElementById('mc'+i);if(c){c.checked=false;aggLbl(i);}});calcMTot();});
+  document.getElementById('btn-salva-multi').addEventListener('click',function(){
+    const id=document.getElementById('m-inq').value;
+    const slot=document.getElementById('m-slot').value;
+    const q=document.getElementById('m-quota').value==='SI'?cfg.quota:0;
+    const mod=document.getElementById('m-mod').value;
+    const pagato=document.getElementById('m-pag').value;
+    if(!id){toast('⚠️ Scegli inquilino!',1);return;}
+    const sel=[];MESI.forEach((m,i)=>{if(document.getElementById('mc'+i)?.checked)sel.push(m);});
+    if(!sel.length){toast('⚠️ Seleziona almeno un mese!',1);return;}
+    const oggi=new Date().toLocaleDateString('it-IT');
+    sel.forEach(m=>{pag[id+'__'+m+'__'+slot]={id,m,s:slot,pagato,mod,q,s1:0,d1:'',s2:0,d2:'',s3:0,d3:'',tot:q,data:oggi};});
+    salvaLS();caricaMesi();toast('✅ Salvati '+sel.length+' mesi per '+gI(id)?.nome+'!');
+  });
+
+  // INQUILINI
+  document.getElementById('btn-salva-inq').addEventListener('click',function(){
+    inq.forEach(x=>{
+      const n=document.getElementById('in'+x.id)?.value.trim();
+      const p=document.getElementById('ip'+x.id)?.value.trim();
+      const ii=document.getElementById('ii'+x.id)?.value.trim();
+      if(n)x.nome=n;if(p)x.piano=p;if(ii)x.interno=ii;
+    });
+    salvaLS();popolaSel();toast('✅ Inquilini aggiornati!');
+  });
+
+  // IMPOSTAZIONI
+  document.getElementById('btn-salva-conf').addEventListener('click',function(){
+    cfg.cond=document.getElementById('s-cond').value;
+    cfg.ind=document.getElementById('s-ind').value;
+    cfg.anno=parseInt(document.getElementById('s-anno').value);
+    cfg.quota=parseFloat(document.getElementById('s-quota').value);
+    cfg.capo=document.getElementById('s-capo').value;
+    salvaLS();aggH();calcTot();toast('✅ Impostazioni salvate!');
+  });
+  document.getElementById('btn-nuovo-anno').addEventListener('click',function(){
+    const n=prompt('Inserisci il nuovo anno:',cfg.anno+1);
+    if(!n)return;
+    if(!confirm('Azzerare tutto per il '+n+'?'))return;
+    pag={};cfg.anno=parseInt(n);salvaLS();aggH();toast('🎉 Anno '+n+' pronto!');
+  });
+
+  // SW
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{});});
+  }
+}
+
+document.addEventListener('DOMContentLoaded',initAll);
+</script>
+</body>
+</html>
